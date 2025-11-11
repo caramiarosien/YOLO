@@ -46,18 +46,12 @@ def masks_to_yolo_seg_lines(
 
         cnt = cnt.reshape(-1, 2).astype(np.float32)
 
-        x, y, w_box, h_box = cv2.boundingRect(cnt.astype(np.int32))
-        x_c = (x + w_box / 2.0) / w
-        y_c = (y + h_box / 2.0) / h
-        w_n = w_box / w
-        h_n = h_box / h
-
         cnt[:, 0] /= float(w)
         cnt[:, 1] /= float(h)
         np.clip(cnt, 0.0, 1.0, out=cnt)
 
         coords = " ".join(f"{value:.6f}" for value in cnt.flatten())
-        line = f"{class_id} {x_c:.6f} {y_c:.6f} {w_n:.6f} {h_n:.6f} {coords}"
+        line = f"{class_id} {coords}"
         lines.append(line)
 
     return lines
@@ -70,4 +64,3 @@ def write_yolo_seg_file(lines: Sequence[str], output_path: Path | str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     content = "\n".join(lines).rstrip() + ("\n" if lines else "")
     path.write_text(content, encoding="utf-8")
-
